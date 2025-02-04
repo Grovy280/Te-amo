@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carta Animada</title>
+  <style>
+    /* 
+      RESETEO BÁSICO
+    */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /*
+      ESTILO DEL BODY: Fondo suave rosado
+    */
+    body {
+      background: linear-gradient(#fff0f0, #ffe6e6);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+    }
+
+    /*
+      CONTENEDOR PRINCIPAL
+      - perspective: para habilitar transformaciones 3D
+    */
+    .scene {
+      perspective: 1000px; /* Ajusta si quieres mayor o menor profundidad */
+    }
+
+    /*
+      LA "ENVOLTURA" DE LA CARTA
+      - transform-style: preserve-3d para que sus hijos se muestren en 3D
+      - transition: para animar la rotación al hacer hover
+    */
+    .envelope {
+      width: 400px;       /* Ajusta según tus necesidades */
+      height: 250px;      /* Ajusta según tus necesidades */
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1s ease;
+      cursor: pointer;
+    }
+
+    /* Sombra flotante debajo de la carta */
+    .envelope::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      filter: blur(8px);
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    /*
+      AL HACER HOVER SOBRE .envelope, se rota 180° en el eje Y
+    */
+    .envelope:hover {
+      transform: rotateY(180deg);
+    }
+
+    /*
+      CARA FRONTAL DE LA CARTA
+      - backface-visibility: hidden para que no se vea cuando rota
+    */
+    .front {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: #d04949; /* Color frontal */
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      backface-visibility: hidden;
+    }
+
+    /* Texto centrado (To y From) */
+    .info {
+      text-align: center;
+      color: #fff;
+      line-height: 1.5;
+      font-size: 1.2rem;
+    }
+
+    /* Sello en la esquina superior derecha */
+    .stamp {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      background-color: #fff;
+      border: 2px solid #d04949;
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stamp img {
+      width: 60%;
+      height: auto;
+    }
+
+    /*
+      CARA POSTERIOR DE LA CARTA
+      - Se inicia rotada en 180° para que no se vea
+    */
+    .back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: #d04949; /* Color de la parte trasera */
+      border-radius: 6px;
+      backface-visibility: hidden;
+      transform: rotateY(180deg);
+      overflow: hidden; /* Para ocultar la nota hasta que se abra la solapa */
+    }
+
+    /*
+      SOLAPA: es la parte triangular que se abre
+      - transform-origin: top center para que gire desde la parte superior
+      - La rotación se controla en el hover de .envelope
+    */
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60%;
+      background-color: #b63737; /* Color un poco más oscuro */
+      border-bottom-left-radius: 300px 40px;
+      border-bottom-right-radius: 300px 40px;
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform 1s ease;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end; /* Para posicionar el corazón de “cierre” */
+    }
+
+    /* Corazón interno (simulando el sello de pegamento) */
+    .seal {
+      margin-bottom: 10px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .seal img {
+      width: 100%;
+      height: auto;
+    }
+
+    /*
+      AL HACER HOVER SOBRE .envelope, la solapa rota hacia atrás (abre la carta)
+    */
+    .envelope:hover .flap {
+      transform: rotateX(-180deg);
+    }
+
+    /*
+      LA NOTA O CARTA INTERIOR
+      - Inicialmente “bajamos” la nota para que no se vea
+      - Se muestra al abrir la solapa (con un retraso para que se vea natural)
+    */
+    .letter {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      transform: translateY(100%);
+      transition: transform 1s ease 0.3s; /* 0.3s de retraso para que coincida con la apertura */
+      border-radius: 0 0 6px 6px;
+      padding-top: 60px; /* espacio para el corazón */
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .envelope:hover .letter {
+      transform: translateY(0);
+    }
+
+    /* Mensaje de la nota */
+    .message {
+      font-size: 1.2rem;
+      color: #333;
+      padding: 0 20px;
+      line-height: 1.5;
+    }
+
+    .heart-top {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 20px auto;
+    }
+
+    .heart-top img {
+      width: 100%;
+      height: auto;
+    }
+
+    .flowers {
+      width: 60px;
+      height: 60px;
+      margin-top: 20px;
+    }
+
+    .flowers img {
+      width: 100%;
+      height: auto;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="envelope">
+      <!-- PARTE FRONTAL -->
+      <div class="front">
+        <div class="info">
+          <p>De: André Monje</p>
+          <p>From: Nayeli Cuizara (Mi niña)</p>
+        </div>
+        <div class="stamp">
+          <!-- Sello con corazon -->
+          <img src="4095180.png" alt="Sello" />
+        </div>
+      </div>
+
+      <!-- PARTE POSTERIOR -->
+      <div class="back">
+        <!-- SOLAPA (flap) -->
+        <div class="flap">
+          <div class="seal">
+            <!-- Corazón de cierre en la solapa -->
+            <img src="6779930.png" alt="Sello interior" />
+          </div>
+        </div>
+
+        <!-- NOTA INTERIOR -->
+        <div class="letter">
+          <!-- Corazón en la parte superior de la nota -->
+          <div class="heart-top">
+            <img src="6782784.png" alt="Corazón en la nota" />
+          </div>
+          <div class="message">
+            Cuanto más tiempo estoy contigo<br>
+            ¡más te amo!
+          </div>
+          <!-- Imagen de flores -->
+          <div class="flowers">
+            <img src="781410.png" alt="Flores" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
